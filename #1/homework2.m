@@ -10,7 +10,7 @@ xa = 0;
 xb = 1;
 ta = 0;
 tb = 1;
-CFL = 0.1;
+CFL = 1;
 n = 3;
 h = geospace(1/10,1/2,n);
 for ii = 1:n
@@ -69,9 +69,9 @@ A = zeros(K,K);
 for ii = 1:N
     for m = 1:K
         for jj = 1:K
-            [phi_m,~] = base_func(m-1,X(ii),X(ii+1));
-            [phi_jj,~] = base_func(jj-1,X(ii),X(ii+1));
-            A(m,jj) = quadgk(@(x) phi_m(x) .* phi_jj(x), X(ii), X(ii+1));
+            [phi_m,~] = Legendre(m-1,X(ii),X(ii+1));
+            [phi_jj,~] = Legendre(jj-1,X(ii),X(ii+1));
+            A(m,jj) = quadgk(@(x) arrayfun(@(x) phi_m(x) .* phi_jj(x), x), X(ii), X(ii+1));
         end
     end
     b = L(u, X(ii), X(ii+1), K);
@@ -105,7 +105,7 @@ u_h = repmat({@(t) 0}, 1, N);
 u_hh = @(t) 0;
 for ii = 1:N
     for jj = 1:K
-        [phi,~] = base_func(jj-1,X(ii),X(ii+1));
+        [phi,~] = Legendre(jj-1,X(ii),X(ii+1));
         u_h{ii} = @(t) u_h{ii}(t) + C(jj,ii) * phi(t);
     end
     u_hh  = @(t) u_hh(t) + ((X(ii) < t) & (t <= X(ii+1))) .* u_h{ii}(t);
@@ -128,7 +128,7 @@ end
 function b = L(u,xa,xb,K)
 b = zeros(K,1);
 for ii = 1:K
-    [phi,diff_phi] = base_func(ii-1,xa,xb);
+    [phi,diff_phi] = Legendre(ii-1,xa,xb);
     b(ii) = quadgk(@(x) u(x) .* diff_phi(x), xa, xb) - u(xb) * phi(xb) + u(xa) * phi(xa);
 end
 end

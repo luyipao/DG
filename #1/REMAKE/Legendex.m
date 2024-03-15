@@ -1,17 +1,5 @@
-% [PN, DPN] = Legendre(0, -1, 1);
-phi_jj = @(x) 1;
-phi_m = @(x) 2;
-quadgk(@(x)  arrayfun(@(x) phi_jj(x) .* phi_m(x),x),1, 2)
-
-function [phi, diff_phi] = base_func(k,xa,xb)
-h = xb - xa;
-phi = @(x) ((x-xa).^k / (h^k)) * (k>=1) + 1.0 * (k ==0);
-% derivation of base function phi
-diff_phi = @(x) (k >=1) * (k * (x-xa).^(k-1) / h^k);
-end
-
 %生成区间[a,b]上的标准Legendre多项式
-function [Pn,DPn] = L(n,a,b)
+function [Pn,DPn] = Legendex(n,a,b)
 Q = @(x) 0.*x;
 DQ = @(x) 0.*x;
 R = @(x) 0.*x + 1;
