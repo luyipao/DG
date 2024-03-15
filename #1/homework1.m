@@ -13,7 +13,7 @@ for p = [1,inf]
             [~,C] = DG(f, a,b,initial_value, size,degree);
             u_h = general(C,a,b,size);
             e_h = error_vec(u,u_h,a,b);
-            disp(['h is ', num2str(size), '; k is: ', num2str(degree), '; in integral [', num2str(a), ', ', num2str(b), ' ], norm is : ', num2str(p), ', e_h is ', num2str(norm(e_h,p))]);
+            disp(['h is ', num2str(size), '; k is: ', num2str(degree), '; in integral [', num2str(a), ', ', num2str(b), ' ], norm is : ', num2str(p), ', e_h is ', num2str(h * norm(e_h,p))]);
         end
     end
 end
