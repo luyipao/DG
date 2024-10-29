@@ -1,5 +1,5 @@
 
-function outputDoping = initialFunction(inputPosition)
+function outputDoping = N_D(inputPosition)
 %% INITIALFUNCTION 计算400nm沟道器件的维度掺杂函数N_D
 % 这是 $\Phi$ 的初始值，即：
 % $\Phi(0,x,w,\mu) = s(w) N_D(x) e^{-w} \mathcal{M}$

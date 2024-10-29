@@ -76,15 +76,12 @@ for k = 1:2
     end
     C(k, N_x, 2 * N_x - 1: 2 * N_x) = [(1 == k), 2==k];
     D(k, end, end-3:end) = [P(end-1,1,2)*P(i,k,1), P(end-1,2,2)*P(i,k,1), 0, 2*sqrt(3)*(k==2)-P(i,2,2)*P(i,k,2)];
-    D(k, end, 1:2) = [-P(1,1,1)*P(end,k,2), -P(end,2,1)*P(end,k,2)];
+    D(k, end, 1:2) = [-P(1,1,1)*P(end,1,2), -P(e)]
+    
+
     B(k, end, end - 3:end) = [-P(i-1, 1,2) * P(i, k, 1), -P(i-1, 2, 2) * P(i, k, 1),P(i, 1, 2) * P(i, k, 2) + P(i, 1, 1) * P(i, k , 1), P(i, 2, 2) * P(i, k , 2) + P(i, 2, 2) * P(i, k, 2)];
     B(k, end, 1:2) = [-P(1, 1, 1) * P(i, k, 2), -P(1, 2, 1)*P(i,k,2)];
     A(k, end, end - 1 : end) = [-(k == 1) - P(i, 1, 1) * P(i, k, 1)  + P(i, 1, 2) * P(i, k, 2), -(k == 2) - P(i, 2, 1) * P(i, k, 1) + P(i, 2, 2) * P(i, k, 2)];
 end
-A = [squeeze(A(1,:,:)), squeeze(B(1,:,:)); 
-     squeeze(C(1,:,:)), squeeze(D(1,:,:)); 
-     squeeze(A(2,:,:)), squeeze(B(2,:,:)); 
-     squeeze(C(2,:,:)), squeeze(D(2,:,:))];
 
 
-B_str = "c_p(rho_h(x)-N_D(x))";

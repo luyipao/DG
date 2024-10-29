@@ -9,3 +9,5 @@ scatter(xp,initialFunction(xp));
 legend("initial function");
 hold off
 
+
+
