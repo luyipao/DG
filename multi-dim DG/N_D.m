@@ -22,7 +22,7 @@ function outputDoping = N_D(inputPosition)
 % 定义常量
 transitionWidth = 0.03;
 highDopingLevel = 5e17;  % 5 * 10^17 cm^-3
-lowDopingLevel = 1e15;   % 1 * 10^15 cm^-3
+lowDopingLevel = 2e15;   % 1 * 10^15 cm^-3
 dopingDifference = highDopingLevel - lowDopingLevel;
 
 % 预分配输出数组
