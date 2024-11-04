@@ -2,7 +2,7 @@ classdef basisPolys
     properties
         X (:,1) double
         Xc (:,1) double
-        h
+        width (:,1) double
         coeffs (:,:) double
         degree (1,1)
         basisFuncs
@@ -13,9 +13,11 @@ classdef basisPolys
         function obj = basisPolys(mesh, coeffs, degree, basisFuncs, interval)
             % intput:
             %   mesh: 1-D mesh
-            %   coeffs: ith colum represent the coeffs of basisFuncs;
+            %   coeffs: coeffs of normlized basisFuncs, cloum correspond to
+            %   the coeff in subinterval [a,b];
             %   degree: max degree of basisFuncs;
-            %   basisFuncs: 1-D cell, basis is in the standard
+            %   basisFuncs: basis must be legendre polynomials for now.
+            %   legendre basis function.
             %   interval;baisFuncs{i}(x) should cal correctly, where x is
             %   vector;
             %   interval: basisFuncs based on this interval: you should cal
@@ -27,6 +29,7 @@ classdef basisPolys
             else
                 obj.X = mesh;
                 obj.Xc = 0.5*(mesh(1:end-1) + mesh(2:end));
+                obj.width = mesh(2:end) - mesh(1:end-1);
                 obj.degree = degree;
                 obj.basisFuncs = basisFuncs;
                 obj.basisInterval = interval;
@@ -43,8 +46,6 @@ classdef basisPolys
                 for j = 1:obj.degree+1
                     obj.basisBoundaryValues(j,:) = obj.basisFuncs{j}(obj.basisInterval);
                 end
-
-                obj.h = abs(mesh(2) - mesh(1));
                 obj.coeffs = coeffs;
             end
         end
@@ -63,8 +64,9 @@ classdef basisPolys
             x = x(:);
 			% scale
 			[x, index] = transform(obj, x);
-			
-            y = obj.coeffs(:,index) .* cell2mat(cellfun(@(f) f(x), obj.basisFuncs, 'UniformOutput', false))';
+            temp = sqrt(1:2:2*obj.degree+1)';
+            temp = (temp ./ sqrt(obj.width)');
+            y =  temp(:, index) .* obj.coeffs(:,index) .* cell2mat(cellfun(@(f) f(x), obj.basisFuncs, 'UniformOutput', false))';
             
             y = reshape(sum(y,1), m, n);
         end
@@ -74,7 +76,7 @@ classdef basisPolys
         % Input: x is the vector of points to be transformed
         % Output: x is the vector of transformed points
             index = discretize(x,obj.X);
-            x = (x-obj.Xc(index))/obj.h;
+            x = 2 * (x-obj.Xc(index)) ./ obj.width(index);
         end
     end
     
