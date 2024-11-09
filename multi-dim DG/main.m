@@ -6,7 +6,7 @@ c_p = 1830349;
 epsilon_r = 11.7;
 c_v = 10;
 l = 1; % max dim of basis function
-V_bias = 1.0;
+V_bias = 1;
 hbar = 1.05457180013e-34;
 k_B = 1.380649e-23;
 T_L = 300;
@@ -22,12 +22,9 @@ c_p = (sqrt(2*m_star*k_B*T_L) / hbar)^3 * l_star^2 * q / epsilon_0
 c_x = t_star / l_star * sqrt(2 * k_B * T_L / m_star)
 c_k = t_star * q * E_star / sqrt(2*m_star * k_B * T_L)
 % mesh region
-L = 1;
+L = 2;
 
-% cells num in diff directions
-N_x = 120;
-N_w = 60;
-N_mu = 24;
+
 
 % grid width
 delta_x_pos = 0.01;
@@ -46,8 +43,10 @@ W = linspace(0, w_max, N_w + 1);
 MU = [linspace(-1, 0.7, N_mu / 2 + 1), linspace(0.7, 1, N_mu / 2 + 1)];
 MU = unique(MU);
 
-% setp 1
-rho_h = @(x) pi * z * 2 * N_D(x);
+% cells num in diff directions
+N_x = length(X) - 1;
+N_w = 60;
+N_mu = 24;
 
 %% step 2 covert equation 3.19 into matrix computation
 % P[i, j , 1:2] : I_i, jth basis function value at left and right.
@@ -58,6 +57,7 @@ P(:, 1, 1) = P(:, 1, 2) .* (-1).^(0);
 P(:, 2, 2) = sqrt(3) ./ sqrt(delta_X(:));
 P(:, 2, 1) = P(:, 2, 2) .* (-1).^(1);
 
+% A1 true
 A1 = cell(1, N_x);
 for i = 1:N_x
     A1{i} = P(i,:,1)' * P(i,:,1);
@@ -66,11 +66,12 @@ A1 = blkdiag(A1{:});
 A1 = A1 + kron(diag(sqrt(3) ./ delta_X), [0 2; 0 0]);
 A1 = - epsilon_r * A1;
 
+% dv
 A2 = cell(1, N_x);
 for i = 1:N_x-1
     A2{i} = epsilon_r * P(i+1,:,1)' * P(i,:,2);
 end
-A2{N_x} = epsilon_r * P(1,:,2)' * P(N_x,:,2);
+A2{N_x} = epsilon_r * P(N_x,:,2)' * P(N_x,:,2);
 temp = diag(diag(eye(N_x-1)), 1);
 temp(N_x, N_x) = 1;
 temp = kron(temp,eye(l+1));
@@ -83,7 +84,7 @@ B1 = cell(1,N_x);
 for i = 1:N_x-1
     B1{i} = -P(i+1,:,1)' * P(i,:,2);
 end
-B1{N_x} = -P(1,:,1)' * P(N_x,:,2);
+B1{N_x} = eye(l+1);
 B1 = blkdiag(B1{:});
 temp = diag(diag(eye(N_x-1)), 1);
 temp = kron(temp,eye(l+1));
@@ -96,7 +97,7 @@ for i = 1:N_x
     B2{i} = P(i,:,2)' * P(i,:,2) + P(i,:,1)' * P(i,:,1);
 end
 B2 = blkdiag(B2{:});
-B2 = kron(eye(N_x), eye(l+1)) * B2;
+
 
 B3 = cell(1, N_x);
 for i = 1:N_x-1
@@ -161,16 +162,18 @@ F(2:2:end) = F2;
 F1 = F - b1 - b3;
 F2 = - d2 - d3;
 
+
 temp = [A B; C D];
 coeff = [A B; C D] \ [F1; F2];
-
+C_q = coeff(1:2*N_x,1);
+C_Psi = coeff(2*N_x + 1:end,1);
 Psi_h = basisPolys(X, reshape(coeff(2*N_x+1:end), l + 1, []), l, basisFuncs, [0, 1]');
-E = basisPolys(X, reshape(-c_v * coeff(1:2*N_x), l + 1, []), l, basisFuncs, [0, 1]');
+E = basisPolys(X, reshape(coeff(1:2*N_x), l + 1, []), l, basisFuncs, [0, 1]');
 % draw p_h and Psi_h
-X = linspace(0, 1,100000);
+XX = linspace(0, L,10000);
 clf
 hold on
-plot(X, Psi_h.solve(X));
-scatter(X, E.solve(X), '.');
+plot(XX, Psi_h.solve(XX));
+scatter(XX, E.solve(XX), '.');
 legend("Psi_h", "E");
 hold off
